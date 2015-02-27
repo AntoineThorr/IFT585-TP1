@@ -27,7 +27,8 @@ public class Main {
             param.load(in);
             in.close();
         } catch (IOException ioe) {
-            ioe.printStackTrace();
+           // ioe.printStackTrace();
+           // System.err.print(ioe);
         }
 
         String inputDir = param.getProperty("inputDir");
