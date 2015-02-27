@@ -1,1 +1,0 @@
-Test de transmission de données de l'émetteur au récepteur.

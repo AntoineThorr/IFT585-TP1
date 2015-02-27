@@ -10,7 +10,7 @@ package Protocole;
  * @author Quentin
  */
 public class Frame {
-    public enum frameType{data, ack, nack};
+    public enum frameType{data, ack, nak};
     
     public int frameSize;
     public frameType type;
@@ -18,8 +18,8 @@ public class Frame {
     public int  ack_num;
     public char[] data;
     
-    public Frame( ){
-        
+    public Frame(int frameSize){
+        this.frameSize = frameSize;
     }
     
 }

@@ -32,7 +32,7 @@ public class Main {
 
         String inputDir = param.getProperty("inputDir");
         String outputDir = param.getProperty("outputDir");
-        int windowSize = Integer.parseInt(param.getProperty("windowSize"));
+        int frameSize = Integer.parseInt(param.getProperty("frameSize"));
         int code = Integer.parseInt(param.getProperty("code"));
         int reject = Integer.parseInt(param.getProperty("reject"));
         int bufferSize = Integer.parseInt(param.getProperty("bufferSize"));
@@ -40,8 +40,8 @@ public class Main {
         int rTimeOut = Integer.parseInt(param.getProperty("rTimeOut"));
         int error = Integer.parseInt(param.getProperty("error"));
 
-        Transmitter transmitter = new Transmitter(inputDir, windowSize, code, sTimeOut);
-        Receiver receiver = new Receiver(outputDir, windowSize, code, reject, rTimeOut);
+        Transmitter transmitter = new Transmitter(inputDir, frameSize, code, sTimeOut);
+        Receiver receiver = new Receiver(outputDir, frameSize, code, reject, rTimeOut);
         
         Support support = new Support(bufferSize,error);
     }

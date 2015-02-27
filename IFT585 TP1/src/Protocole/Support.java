@@ -15,4 +15,9 @@ public class Support {
         this.receiver = null;
     }
     
+    private void send(Station receiver){
+        this.receiver = receiver;
+        
+    }
+    
 }
