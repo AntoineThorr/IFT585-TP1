@@ -10,16 +10,17 @@ package Protocole;
  * @author Quentin
  */
 public class Frame {
-    public enum frameType{data, ack, nak};
+    public enum frameTypes{data, ack, nak};
     
-    public int frameSize;
-    public frameType type;
-    public int seq_num;
-    public int  ack_num;
-    public char[] data;
+    public int size;
+    public frameTypes type;
+    public int num;
+    public byte[] data;
     
-    public Frame(int frameSize){
-        this.frameSize = frameSize;
+    public Frame(int frameSize, frameTypes frameType, int frameNum, byte[] frameData){
+        this.size = frameSize;
+        this.type = frameType;
+        this.num = frameNum;
+        this.data = frameData;
     }
-    
 }
