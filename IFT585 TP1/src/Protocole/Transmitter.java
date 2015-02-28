@@ -40,7 +40,7 @@ public class Transmitter extends Station implements Runnable {
 
         byte[] data = readFile(this.inputDir);
 
-        while (data.length - this.frameID * this.frameSize > this.frameSize) {
+        while (data.length - this.frameID * this.frameSize > 0) {
             buffer.add(genFrame(data));
             //TODO - Checker le booléen "peut envoyer" ?
             //TODO - Si peut envoyer, gérer l'envoi (transmettre au support)
