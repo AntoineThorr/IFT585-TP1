@@ -58,7 +58,6 @@ public class Transmitter extends Station implements Runnable {
                 } catch (InterruptedException ex) {
                     Logger.getLogger(Transmitter.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                
             }
             support.sendFrameDest((Frame) buffer.peek());
  

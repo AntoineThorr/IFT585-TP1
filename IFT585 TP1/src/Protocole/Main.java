@@ -4,8 +4,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-/**
- * Classe d'exécution du programme
+/** 
+* Classe d'exécution du programme
  *
  * @author Antoine Thorr
  */
@@ -45,6 +45,6 @@ public class Main {
         Transmitter transmitter = new Transmitter(inputDir, frameSize, code, sTimeOut, support);
         Receiver receiver = new Receiver(outputDir, frameSize, code, reject, rTimeOut, support);
         
-        transmitter.run();
+        //transmitter.run();
     }
 }

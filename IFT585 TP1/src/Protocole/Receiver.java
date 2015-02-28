@@ -44,5 +44,15 @@ public class Receiver extends Station implements Runnable {
         for (int i = 0; i < f.getData().length; i++) {
             this.fileBuffer.add(f.getData()[i]);
         }
+        this.writeToFile();
+        
+        
+    }
+    
+    private void writeToFile() {
+        
+        while(this.fileBuffer.iterator().hasNext()) {
+            
+        }
     }
 }
