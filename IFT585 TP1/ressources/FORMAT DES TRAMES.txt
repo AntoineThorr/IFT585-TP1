@@ -1,0 +1,18 @@
+FORMAT TEMPORAIRE (sans contrôles ni erreurs ni...?)
+
+
+
+
+data :
+
+[Type] [Numéro trame] [données]
+
+
+ACK :
+
+[Type] [Numéro trame concernée]
+
+
+NAK :
+
+[Type] [Numéro trame concernée]
