@@ -6,10 +6,10 @@ package Protocole;
  */
 public class Frame {   
 
-    public int size;
-    public String type;
-    public int num;
-    public byte[] data;
+    private int size;
+    private String type;
+    private int num;
+    private byte[] data;
     
     /**
      *
@@ -24,4 +24,34 @@ public class Frame {
         this.num = frameID;
         this.data = frameData;
     }
+
+    /**
+     * @return the size
+     */
+    public int getSize() {
+        return size;
+    }
+
+    /**
+     * @return the type
+     */
+    public String getType() {
+        return type;
+    }
+
+    /**
+     * @return the num
+     */
+    public int getNum() {
+        return num;
+    }
+
+    /**
+     * @return the data
+     */
+    public byte[] getData() {
+        return data;
+    }
+    
+    
 }

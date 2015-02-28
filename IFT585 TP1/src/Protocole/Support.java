@@ -1,8 +1,5 @@
 package Protocole;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 /**
  * Classe simulant le rôle du support de transmission.
  * @author Antoine Thorr
@@ -32,11 +29,11 @@ public class Support {
         this.frameSentSource = f;
         this.readySource = false;
        
-        try {
-            Thread.sleep(this.bufferSize);
-        } catch (InterruptedException ex) {
-            ex.printStackTrace();
-        }
+//        try {
+//            Thread.sleep(this.bufferSize);
+//        } catch (InterruptedException ex) {
+//            ex.printStackTrace();
+//        }
         
         this.frameReceivedDest = this.frameSentSource;
         this.readySource = true;
