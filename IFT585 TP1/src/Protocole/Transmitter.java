@@ -95,10 +95,14 @@ public class Transmitter extends Station implements Runnable {
         int start = this.frameID * this.frameSize;
         int stop = (this.frameID + 1) * this.frameSize;
         byte[] frameData = Arrays.copyOfRange(data, start, stop);
-        Frame f = new Frame(this.frameSize, "data", this.frameID, frameData);
+        
 
-        this.frameID++;
+        
         //TO DO ajouter code de Hamming
+        //Hamming.code(frameData);
+        
+        Frame f = new Frame(this.frameSize, "data", this.frameID, frameData);
+        this.frameID++;
         return f;
     }
 

@@ -44,7 +44,7 @@ public class Main {
         Support support = new Support(bufferSize,error);
         
         Transmitter transmitter = new Transmitter(inputDir, frameSize, code, sTimeOut, support);
-        Receiver receiver = new Receiver(outputDir, frameSize, code, reject, rTimeOut);
+        Receiver receiver = new Receiver(outputDir, frameSize, code, reject, rTimeOut, support);
         
         transmitter.run();
     }
