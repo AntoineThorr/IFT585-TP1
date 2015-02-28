@@ -1,23 +1,28 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package Protocole;
 
 /**
  *
  * @author Quentin
  */
-public class Receiver extends Station implements Runnable{
+public class Receiver extends Station implements Runnable {
 
-    Receiver(String outputDir, int windowSize, int code, int reject, int rTimeOut) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    String outputDir;
+    int frameSize;
+    int code;
+    int reject;
+    int rTimeOut;
+
+    Receiver(String outputDir, int frameSize, int code, int reject, int rTimeOut) {
+        this.outputDir = outputDir;
+        this.frameSize = frameSize;
+        this.code = code;
+        this.reject = reject;
+        this.rTimeOut = rTimeOut;
     }
 
     @Override
     public void run() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
+
 }

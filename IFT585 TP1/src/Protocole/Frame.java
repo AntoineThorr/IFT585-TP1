@@ -1,26 +1,42 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package Protocole;
 
 /**
  *
  * @author Quentin
  */
-public class Frame {
-    public enum frameTypes{data, ack, nak};
-    
+public class Frame {   
+
+    /**
+     *
+     */
     public int size;
-    public frameTypes type;
+
+    /**
+     *
+     */
+    public String type;
+
+    /**
+     *
+     */
     public int num;
+
+    /**
+     *
+     */
     public byte[] data;
     
-    public Frame(int frameSize, frameTypes frameType, int frameNum, byte[] frameData){
+    /**
+     *
+     * @param frameSize
+     * @param type
+     * @param frameID
+     * @param frameData
+     */
+    public Frame(int frameSize, String type, int frameID, byte[] frameData){
         this.size = frameSize;
-        this.type = frameType;
-        this.num = frameNum;
+        this.type = type;
+        this.num = frameID;
         this.data = frameData;
     }
 }
