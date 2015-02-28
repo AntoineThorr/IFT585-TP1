@@ -6,24 +6,9 @@ package Protocole;
  */
 public class Frame {   
 
-    /**
-     *
-     */
     public int size;
-
-    /**
-     *
-     */
     public String type;
-
-    /**
-     *
-     */
     public int num;
-
-    /**
-     *
-     */
     public byte[] data;
     
     /**
