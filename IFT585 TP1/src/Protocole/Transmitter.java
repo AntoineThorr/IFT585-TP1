@@ -5,6 +5,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 
 /**
@@ -18,6 +20,8 @@ public class Transmitter extends Station implements Runnable {
     int code;
     int sTimeOut;
     int frameID = 0;
+    Support support;
+    CircularFifoQueue buffer;
 
     /**
      *
@@ -25,27 +29,41 @@ public class Transmitter extends Station implements Runnable {
      * @param frameSize
      * @param code
      * @param sTimeOut
+     * @param s
      */
-    public Transmitter(String inputDir, int frameSize, int code, int sTimeOut) {
+    public Transmitter(String inputDir, int frameSize, int code, int sTimeOut, Support s) {
         this.inputDir = inputDir;
         this.frameSize = frameSize;
         this.code = code;
         this.sTimeOut = sTimeOut;
+        this.support = s;
     }
 
     @Override
     public void run() {
         int bufferSize = (int) Math.pow(2, this.frameSize) - 1;
-        CircularFifoQueue buffer = new CircularFifoQueue(bufferSize);
+        buffer = new CircularFifoQueue(bufferSize);
 
         byte[] data = readFile(this.inputDir);
 
         while (data.length - this.frameID * this.frameSize > 0) {
+            
+            
             buffer.add(genFrame(data));
-            //TODO - Checker le booléen "peut envoyer" ?
-            //TODO - Si peut envoyer, gérer l'envoi (transmettre au support)
+            
+            
+            if(!support.getReadyDest()){
+                try {
+                    this.wait();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(Transmitter.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
+            }
+            support.sendFrameDest((Frame) buffer.peek());
+ 
         }
-        
+       
         
 
     }
@@ -80,7 +98,9 @@ public class Transmitter extends Station implements Runnable {
         Frame f = new Frame(this.frameSize, "data", this.frameID, frameData);
 
         this.frameID++;
-
+        //TO DO ajouter code de Hamming
         return f;
     }
+
+  
 }

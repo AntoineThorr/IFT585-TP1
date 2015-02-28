@@ -43,7 +43,7 @@ public class Support {
         this.receivedDest = true;
     }
     
-    private void sendFrameDest(Frame f) {
+    public void sendFrameDest(Frame f) {
         this.frameSentDest = f;
         this.readyDest = false;
        
@@ -58,29 +58,29 @@ public class Support {
         this.receivedSource = true;
     }
     
-    private Frame getFrameDest() {
+    public Frame getFrameDest() {
         this.receivedDest = false;
         return this.frameReceivedDest;
     }
     
-    private Frame getFrameSource() {
+    public Frame getFrameSource() {
         this.receivedSource = false;
         return this.frameReceivedSource;
     }
     
-    private boolean getReadySource() {
+    public boolean getReadySource() {
         return this.readySource;
     }
     
-    private boolean getReadyDest() {
+    public boolean getReadyDest() {
         return this.readyDest;
     }
     
-    private boolean getReceivedDest() {
+    public boolean getReceivedDest() {
         return this.receivedDest;
     }
     
-    private boolean getReceivedSource() {
+    public boolean getReceivedSource() {
         return this.receivedSource;
     }
 }
