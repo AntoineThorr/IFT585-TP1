@@ -40,7 +40,6 @@ public class Main {
         int rTimeOut = Integer.parseInt(param.getProperty("rTimeOut"));
         int error = Integer.parseInt(param.getProperty("error"));
 
-        
         Support support = new Support(bufferSize,error);
         
         Transmitter transmitter = new Transmitter(inputDir, frameSize, code, sTimeOut, support);
