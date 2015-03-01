@@ -1,8 +1,13 @@
 package Protocole;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import static org.apache.commons.lang3.ArrayUtils.toPrimitive;
 
 /**
  *
@@ -30,29 +35,41 @@ public class Receiver extends Station implements Runnable {
 
     @Override
     public void run() {
-//        Object lock = new Object();
-//        synchronized (lock) { //A vérifier
-//            if (!support.getReceivedDest()) {
-//                try {
-//                    this.wait();
-//                } catch (InterruptedException ex) {
-//                    ex.printStackTrace();
-//                }
-//            }
-//        }
+        // http://www.tutorialspoint.com/java/java_thread_synchronization.htm
+        // http://openclassrooms.com/courses/apprenez-a-programmer-en-java/executer-des-taches-simultanement
+        synchronized (this.support) { //A vérifier
+            if (!support.getReceivedDest()) {
+                try {
+                    this.wait();
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                    System.out.println("Notification depuis le support ?");
+                }
+            }
+        }
         Frame f = support.getFrameDest();
         for (int i = 0; i < f.getData().length; i++) {
             this.fileBuffer.add(f.getData()[i]);
         }
         this.writeToFile();
-        
-        
     }
     
     private void writeToFile() {
+        byte[] data = toPrimitive(fileBuffer.toArray(new Byte[fileBuffer.size()])); //Conversion de l'ArrayList<Byte> en byte[]
         
-        while(this.fileBuffer.iterator().hasNext()) {
-            
+        //Conversion en string et affichage console
+        try {
+            String output = new String(data,"UTF-8");
+            System.out.println(output);
+        } catch (UnsupportedEncodingException ex) {
+            ex.printStackTrace();
+        }
+        
+        //Ecriture du fichier de sortie
+        try {
+            Files.write(Paths.get(this.outputDir), data);
+        } catch (IOException ex) {
+            ex.printStackTrace();
         }
     }
 }

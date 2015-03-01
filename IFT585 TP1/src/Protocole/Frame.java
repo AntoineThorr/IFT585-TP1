@@ -52,6 +52,4 @@ public class Frame {
     public byte[] getData() {
         return data;
     }
-    
-    
 }

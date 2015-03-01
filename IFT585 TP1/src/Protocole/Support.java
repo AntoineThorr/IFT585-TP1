@@ -4,7 +4,7 @@ package Protocole;
  * Classe simulant le rôle du support de transmission.
  * @author Antoine Thorr
  */
-public class Support {
+public class Support implements Runnable{
     //Variables pour l'envoi du message
     Frame frameSentSource;
     Frame frameReceivedDest;
@@ -23,6 +23,11 @@ public class Support {
     Support(int bufferSize, int error) {
         this.bufferSize = bufferSize;
         this.error = error;
+    }
+    
+    @Override
+    public void run() {
+        
     }
     
     private void sendFrameSource(Frame f) {

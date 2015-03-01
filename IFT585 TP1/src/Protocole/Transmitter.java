@@ -2,11 +2,8 @@ package Protocole;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 
 /**
@@ -47,35 +44,27 @@ public class Transmitter extends Station implements Runnable {
         byte[] data = readFile(this.inputDir);
 
         while (data.length - this.frameID * this.frameSize > 0) {
-            
-            
             buffer.add(genFrame(data));
-            
-            
-            if(!support.getReadyDest()){
-                try {
-                    this.wait();
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(Transmitter.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                
+            if (!support.getReadyDest()) {
+//                try {
+//                    this.wait();
+//                } catch (InterruptedException ex) {
+//                    Logger.getLogger(Transmitter.class.getName()).log(Level.SEVERE, null, ex);
+//                }
+
             }
             support.sendFrameDest((Frame) buffer.peek());
- 
         }
-       
-        
-
     }
 
     private byte[] readFile(String p) {
-        Path path = Paths.get(p);
         byte[] data = null;
         try {
-            data = Files.readAllBytes(path);
+            data = Files.readAllBytes(Paths.get(p)); //Enregistrement dans le format "byte" de Java : de -128 à 127
             for (int i = 0; i < data.length; i++) {
                 System.out.println(i + " -> " + data[i]);
             }
+            System.out.println(new String(data, "UTF-8")); //Debug : affichage console reconstitué
             return data;
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -95,16 +84,11 @@ public class Transmitter extends Station implements Runnable {
         int start = this.frameID * this.frameSize;
         int stop = (this.frameID + 1) * this.frameSize;
         byte[] frameData = Arrays.copyOfRange(data, start, stop);
-        
 
-        
         //TO DO ajouter code de Hamming
         //Hamming.code(frameData);
-        
         Frame f = new Frame(this.frameSize, "data", this.frameID, frameData);
         this.frameID++;
         return f;
     }
-
-  
 }
