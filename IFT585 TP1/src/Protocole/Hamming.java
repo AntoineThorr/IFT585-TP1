@@ -9,6 +9,9 @@ public class Hamming {
     public static void code(byte[] byteArray){
         boolean bitArray[] = byteToBitArray(byteArray);
         int nbData = bitArray.length;
+        int nbControl = (int)Math.floor(((Math.log(nbData))/Math.log(2)) + 1); //nbControl = log2(nbdata)
+        boolean bitArrayCoded[] = new boolean[nbData+nbControl];
+        
         
     }
     
