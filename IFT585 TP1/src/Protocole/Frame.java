@@ -31,15 +31,15 @@ public class Frame {
     private boolean type;       //0 = Acknowledgment   ;   1 = Data
     
     // Les données
-    private char[] data;
+    private byte[] data;
     
     // TODO : Pour la validation.
     private int totalControle;
     
     
     // Constructeur d'une trame. 
-     public Frame(int frameSize, char[] data, boolean isData){
-        this.data = new char[frameSize];
+     public Frame(int frameSize, byte[] data, boolean isData){
+        this.data = new byte[frameSize];
         this.data = data;
         type = isData;      // TRUE si des données, FALSE si acknowledgment
      }
@@ -65,11 +65,11 @@ public class Frame {
              result.append(data[i]);
          }
   
-         System.out.println(result);
+         //System.out.println(result);
      }
 
      // Fonction retournant les données de la trame.
-    public char[] getData() {
+    public byte[] getData() {
         return data;
      }
     
