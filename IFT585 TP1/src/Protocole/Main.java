@@ -37,6 +37,9 @@ public class Main {
         int rTimeOut = Integer.parseInt(param.getProperty("rTimeOut"));
         int error = Integer.parseInt(param.getProperty("error"));
         
+      
+      
+        
         File file = new File(inputDir);
         Support support = new Support(1, 2, error);
         Station station1 = new Station(support, bufferSize, frameSize, 1);
