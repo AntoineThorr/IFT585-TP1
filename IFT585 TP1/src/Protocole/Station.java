@@ -60,13 +60,10 @@ public class Station extends Thread {
         while (true) {
             // On vérifie si le support est disponible pour l'envoi et/ou si
             //   une trame a été reçu pour la station.
-            boolean readyToSend, dataReceived;
-            readyToSend = supportTransmission.isReadyToSend(stationNumber);
-            dataReceived = supportTransmission.asReceivedData(stationNumber);
 
             // On vérifie si le support est prêt à envoyer et s'il y a quelque
             //   chose dans le tampon d'envoi.
-            if (readyToSend && sendBuffer.isNotEmpty()) {
+            if (supportTransmission.isReadyToSend(stationNumber) && sendBuffer.isNotEmpty()) {
                 // "next" va contenir la position dans le buffer d'envoi de la
                 //   prochaine trame à envoyer. Retourne -1 s'il n'y en a pas à envoyer.
                 // En théorie, si le buffer contient un élément et qu'il n'est pas à
@@ -75,6 +72,7 @@ public class Station extends Thread {
                 if (next != -1) {
                     // On va chercher la trame dans le buffer.
                     Frame frameToSend = sendBuffer.getFrame(next);
+                    //System.out.println(frameToSend.getFrameNumber());
                     // On envoie la trame sur le support.
                     supportTransmission.sendFrame(frameToSend, stationNumber);
                     // Si c'est un ACK/NACK, on le détruit
@@ -90,7 +88,8 @@ public class Station extends Thread {
 
             // On vérifie si une trame a été reçu et que le buffer de réception n'est pas 
             // plein.
-            if (dataReceived && receiveBuffer.isNotFull()) {
+            
+            if (supportTransmission.asReceivedData(stationNumber) && receiveBuffer.isNotFull()) {
                 // On va chercher la trame reçue.
                 Frame frameReceived = supportTransmission.retrieveData(stationNumber);
                 // La fonction peut retourner NULL s'il y a une erreur.
@@ -152,6 +151,7 @@ public class Station extends Thread {
         // Initialise le buffer si c'est la première trame reçue.
         // Le buffer de réception va pouvoir contenir le nombre exacte de trame
         //   à recevoir pour un fichier. Beaucoup plus facile de cette façon.
+        //frame.readData();
         int numberOfFrames = frame.getNumberOfFrames();
         if (receiveBuffer.size() != numberOfFrames) {
             receiveBuffer.initializeBuffer(numberOfFrames);
@@ -197,13 +197,14 @@ public class Station extends Thread {
     private void writeFile() {
         try {
             FileOutputStream ops = new FileOutputStream(outputDir);
-            this.receiveBuffer.getFrame(frameSize);
+            //this.receiveBuffer.getFrame(frameSize);
             for (int i = 0; i < this.receiveBuffer.size(); i++) {
                 byte[] data = receiveBuffer.getFrame(i).getData();
-
+                
                 //debug
-                String output = new String(data, "UTF-8");
-                System.out.println(output);
+//                System.out.println(i);
+//                String output = new String(data, "UTF-8");
+//                System.out.println(output);
 
                 ops.write(data, 0, data.length);
             }

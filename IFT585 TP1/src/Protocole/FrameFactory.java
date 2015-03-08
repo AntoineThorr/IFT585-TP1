@@ -121,11 +121,11 @@ public class FrameFactory {
     // J'ajoute la quantité de trame et le numéro de la trame pour me faciliter 
     //   la vie.
     public Frame getFrame(int frameNumber) {
+        Frame frame = this.dataBlocks.get(frameNumber);
 //        Frame frame = new Frame(frameSize, (byte[]) dataBlocks.get(frameNumber), true);
-//        frame.setFrameNumber(frameNumber);
-//        frame.setNumberOfFrames(frameCount);
-//        return frame;
-        return this.dataBlocks.get(frameNumber);
+        frame.setFrameNumber(frameNumber);
+        frame.setNumberOfFrames(frameCount);
+        return frame;
     }
 
     // Retourne le nombre de trame pour le fichier

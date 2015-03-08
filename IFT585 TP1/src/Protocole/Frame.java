@@ -65,7 +65,7 @@ public class Frame {
              result.append(data[i]);
          }
   
-         //System.out.println(result);
+         System.out.println(result);
      }
 
      // Fonction retournant les données de la trame.

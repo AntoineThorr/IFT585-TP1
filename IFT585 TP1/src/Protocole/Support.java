@@ -54,13 +54,24 @@ public class Support extends Thread{
     private int destinationNumber = 0;
     
     
+    // Type d'erreur
+    private int typeError;
+    final static private int NOERROR = 0;
+    final static private int CORRUPTION = 1;
+    final static private int LOSTFRAME = 2;
+    
+    private int errorCounter;
+    final static private int errorOccurence = 10;
+    
     // Constructeur
     // Par défaut, on décide qu'une station sera la source et l'autre la destination.
-    public Support(int sourceNumber, int destinationNumber){
+    public Support(int sourceNumber, int destinationNumber, int error){
         this.sourceNumber = sourceNumber;
         this.destinationNumber = destinationNumber;
         readyToSendSource = readyToSendDestination = true;
         dataReceivedAtDest = dataReceivedAtSource = false;
+        this.typeError = error;
+        this.errorCounter = 0;
     }
     
     // Fonction appelée par une station afin de savoir si elle peut envoyer
@@ -123,6 +134,54 @@ public class Support extends Thread{
         this.destinationNumber = destinationNumber;
     }
     
+    private Frame transfert(Frame frame) {
+        // Latence
+        try {
+            Support.sleep(100);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Support.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        if(typeError != NOERROR){
+            errorCounter = (errorCounter + 1) % errorOccurence;
+            //System.out.println(errorCounter);
+        }
+        
+        switch (typeError) {
+            case NOERROR:
+                break;
+            case CORRUPTION:
+                if (errorCounter == 0){
+                    System.out.println("Frame : " + frame.getFrameNumber() + "  Data :");
+                    int frameNumber = frame.getFrameNumber();
+                    int numberOfFrames = frame.getNumberOfFrames();
+                    frame.readData();
+                    Hamming hamming = new Hamming();
+                    int i;
+                    byte[] rawData = frame.getData();
+                    boolean[] data = new boolean[rawData.length * 8];
+                    data = hamming.byteToBitArray(frame.getData());
+                    System.out.println(data[3]);
+                    data[3] = !data[3];
+                    System.out.println(data[3]);
+                    byte[] newData = hamming.bitToByteArray(data);
+                    frame = new Frame(rawData.length, newData, true);
+                    frame.setFrameNumber(frameNumber);
+                    frame.setNumberOfFrames(numberOfFrames);
+                }
+                break;
+            case LOSTFRAME:
+                if (errorCounter == 0){
+//                    System.out.println("Frame : " + frame.getFrameNumber() + "  Data :");
+//                    frame.readData();
+                    frame = null;
+                }
+                break;
+        }
+        
+        return frame;
+    }
+
     // Fonction du thread.
     //
     // TODO : Fait de l'attente active. C'est ce qu'il y a de plus simple mais ça
@@ -136,28 +195,53 @@ public class Support extends Thread{
             // Ça ne fonctionne pas sans le sleep...
             //
             // TODO : Élucider le mystère du sleep. Sans lui, plus rien ne fonctionne.
-            try {
-                Support.sleep(100);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(Support.class.getName()).log(Level.SEVERE, null, ex);
-            }      
             
             // Vérifie si la source attend pour envoyer une trame et que la destination
             //   a traité sa dernière trame reçue.
-            if(!readyToSendSource && !dataReceivedAtDest){
-                receivedAtDestination = sendSource;
-                readyToSendSource = true;
-                dataReceivedAtDest = true;
-            } 
-            
+//            try {
+//                Support.sleep(100);
+//            } catch (InterruptedException ex) {
+//                Logger.getLogger(Support.class.getName()).log(Level.SEVERE, null, ex);
+//            }
+    
+            Frame frameToSend;
+            synchronized (System.out) {
+                if (!readyToSendSource && !dataReceivedAtDest && sendSource != null) {
+                    System.out.println("Sending data frame " + sendSource.getFrameNumber() + " at destination.");
+                    frameToSend = transfert(sendSource);
+                    receivedAtDestination = frameToSend;
+                    if (frameToSend == null) {
+                        System.out.println("ERROR : Data frame was lost");
+                    } else {
+                        System.out.println("Data frame " + frameToSend.getFrameNumber() + " was received at destination.");
+                    }
+                    readyToSendSource = true;
+                    dataReceivedAtDest = true;
+                }
+                System.out.flush();
+            }
+
+            synchronized (System.out) {
             // Vérifie si la destination attend pour envoyer une trame et que la source
-            //   a traité sa dernière trame reçue.
-            if(!readyToSendDestination && !dataReceivedAtSource){
-                receivedAtSource = sendDestination;
-                readyToSendDestination = true;
-                dataReceivedAtSource = true;
+                //   a traité sa dernière trame reçue.
+                if (!readyToSendDestination && !dataReceivedAtSource && sendDestination != null) {
+                    //synchronized (System.out) {
+                    System.out.println("Sending acknowledgment for frame " + sendDestination.getFrameNumber() + " at source.");
+                    //System.out.flush();
+                    //}
+                    frameToSend = transfert(sendDestination);
+                    receivedAtSource = frameToSend;
+                    if (frameToSend == null) {
+                        System.out.println("ERROR : Acknowledgment was lost");
+                    } else {
+                        System.out.println("Acknowledgment for frame " + frameToSend.getFrameNumber() + " was received at source.");
+                    }
+                    readyToSendDestination = true;
+                    dataReceivedAtSource = true;
+                }
+                System.out.flush();
             }
         }
     }
-    
+
 }

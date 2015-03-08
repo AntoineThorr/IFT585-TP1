@@ -8,6 +8,7 @@ package Protocole;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Properties;
 
 /**
@@ -37,7 +38,7 @@ public class Main {
         int error = Integer.parseInt(param.getProperty("error"));
         
         File file = new File(inputDir);
-        Support support = new Support(1, 2);
+        Support support = new Support(1, 2, error);
         Station station1 = new Station(support, bufferSize, frameSize, 1);
         Station station2 = new Station(support, bufferSize, frameSize, 2);
  
@@ -47,14 +48,38 @@ public class Main {
          station2.start();
          support.start();
         station1.sendFile(file, station2.getStationNumber());
+        
  
         
-//        FrameGenerator test = new FrameGenerator(file, frameSize);
+//        FrameFactory test = new FrameFactory(file, frameSize);
+//        Hamming hamming = new Hamming();
 //        
 //        Frame frame1 = test.getFrame(1);
 //        Frame frame2 = test.getFrame(2);
 //        Frame frame3 = test.getFrame(3);
 //        Frame frame4 = test.getFrame(4);
+        
+//        byte[] bytes = new byte[2];
+//        bytes[0] = (byte) 'W';
+//        bytes[1] = (byte) 'e';
+//        
+//        boolean[] frame1Bits = new boolean[frameSize * 8];
+//        
+//        frame1Bits = Hamming.byteToBitArray(frame1.getData());
+//        
+//        System.out.println(Arrays.toString(frame1.getData()));
+//        System.out.println(Arrays.toString(frame1Bits));
+//        
+//        byte[] bytes2 = new byte[2];
+//        bytes2 = hamming.bitToByteArray(frame1Bits);
+//        System.out.println(Arrays.toString(bytes2));
+        
+        
+        
+//        System.out.println(bytes[0]);
+//        System.out.println(bytes[1]);
+//        System.out.println(Arrays.toString(bytes));
+//        System.out.println(Arrays.toString(frame1Bits));
 //        
 //        frame1.readData();
 //        frame2.readData();
