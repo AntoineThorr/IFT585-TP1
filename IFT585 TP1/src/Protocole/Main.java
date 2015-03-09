@@ -37,8 +37,13 @@ public class Main {
         int rTimeOut = Integer.parseInt(param.getProperty("rTimeOut"));
         int error = Integer.parseInt(param.getProperty("error"));
         
-      
-      
+//        Test du codage, decodage de la classe Hamming        
+//        
+//        boolean[] b = {false, true, true, true, false, true, true, false};
+//        boolean[] hamming_b_with_error = {true, false,false, true, true, true,true, false,false,true,false,false,false,false,false,false};
+//        System.out.println("b : " + Arrays.toString(b));
+//        System.out.println("b codé avec hamming : " + Arrays.toString(Hamming.code(Hamming.bitToByteArray(b))));
+//        System.out.println("b avec erreur corrigé : "+ Arrays.toString(Hamming.decode(Hamming.bitToByteArray(hamming_b_with_error), 1)));
         
         File file = new File(inputDir);
         Support support = new Support(1, 2, error);
