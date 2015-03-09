@@ -1,14 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package Protocole;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Properties;
 
 /**
@@ -16,9 +10,10 @@ import java.util.Properties;
  * @author ghor
  */
 public class Main {
-     public static void main(String[] args) throws IOException {
-         Properties param = new Properties();
-         
+
+    public static void main(String[] args) throws IOException {
+        Properties param = new Properties();
+
         try {
             FileInputStream in = new FileInputStream("ressources/Parameters.properties");
             param.load(in);
@@ -26,7 +21,7 @@ public class Main {
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
-        
+
         String inputDir = param.getProperty("inputDir");
         String outputDir = param.getProperty("outputDir");
         int frameSize = Integer.parseInt(param.getProperty("frameSize"));
@@ -49,16 +44,16 @@ public class Main {
         Support support = new Support(1, 2, error);
         Station station1 = new Station(support, bufferSize, frameSize, 1);
         Station station2 = new Station(support, bufferSize, frameSize, 2);
- 
+
         station1.setOutputDir(outputDir);
         station2.setOutputDir(outputDir);
-         station1.start();
-         station2.start();
-         support.start();
+        station1.setTempo(sTimeOut);
+        station2.setTempo(rTimeOut);
+        station1.start();
+        station2.start();
+        support.start();
         station1.sendFile(file, station2.getStationNumber());
-        
- 
-        
+
 //        FrameFactory test = new FrameFactory(file, frameSize);
 //        Hamming hamming = new Hamming();
 //        
@@ -66,7 +61,6 @@ public class Main {
 //        Frame frame2 = test.getFrame(2);
 //        Frame frame3 = test.getFrame(3);
 //        Frame frame4 = test.getFrame(4);
-        
 //        byte[] bytes = new byte[2];
 //        bytes[0] = (byte) 'W';
 //        bytes[1] = (byte) 'e';
@@ -81,9 +75,6 @@ public class Main {
 //        byte[] bytes2 = new byte[2];
 //        bytes2 = hamming.bitToByteArray(frame1Bits);
 //        System.out.println(Arrays.toString(bytes2));
-        
-        
-        
 //        System.out.println(bytes[0]);
 //        System.out.println(bytes[1]);
 //        System.out.println(Arrays.toString(bytes));
@@ -94,5 +85,5 @@ public class Main {
 //        frame3.readData();
 //        frame4.readData();
     }
-    
+
 }

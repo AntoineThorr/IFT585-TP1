@@ -1,16 +1,15 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package Protocole;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.lang3.ArrayUtils;
 
 /*
  Objet permettant de représenter une station d'émission et de réception de
@@ -38,7 +37,15 @@ public class Station extends Thread {
     // Numéro de la station permettant de s'identifier sur le support.
     private int stationNumber;
 
-    // Constructeur
+    // Délai de temporisation (durée du timer du buffer)
+    private int tempo;
+
+    //Timers gérant l'expiration des frames envoyées (remplace le tick maison)
+    Timer[] sTimers;
+
+    /**
+     * Constructeur
+     */
     public Station(Support supportTransmission, int bufferSize, int frameSize, int stationNumber) {
         this.supportTransmission = supportTransmission;
         sendBuffer = new Buffer(bufferSize);
@@ -88,7 +95,6 @@ public class Station extends Thread {
 
             // On vérifie si une trame a été reçu et que le buffer de réception n'est pas 
             // plein.
-            
             if (supportTransmission.asReceivedData(stationNumber) && receiveBuffer.isNotFull()) {
                 // On va chercher la trame reçue.
                 Frame frameReceived = supportTransmission.retrieveData(stationNumber);
@@ -127,16 +133,25 @@ public class Station extends Thread {
         supportTransmission.setSource(stationNumber);
         supportTransmission.setDestination(destination);
 
-        int i = 0;
         int numberOfFrames = frameFactory.getNumberOfFrames();
+        sTimers = new Timer[numberOfFrames];
 
         // Remplir le tampon d'envoi
         // Tant que toutes les trames n'ont pas toutes été envoyées, la fonction
         //   va vérifier si le tampon d'envoi est plein. Si ce n'est pas le cas,
         //   elle va y placer la prochaine trame.
+        int i = 0;
         while (i < numberOfFrames) {
             if (sendBuffer.isNotFull()) {
                 sendBuffer.addFrame(frameFactory.getFrame(i));
+//                sTimers[i] = new Timer();
+//                sTimers[i].schedule(new TimerTask() {
+//                    public void run() {
+//                        //TODO - Gérer l'expiration de la trame, ici ou dans station ?
+//                        System.err.println("TIMER ");
+//                    }
+//                }, tempo);
+//                System.err.println("i");
                 i++;
             }
         }
@@ -196,33 +211,34 @@ public class Station extends Thread {
 //    }
     private void writeFile() {
         try {
-            FileOutputStream ops = new FileOutputStream(outputDir);
-            //this.receiveBuffer.getFrame(frameSize);
-            for (int i = 0; i < this.receiveBuffer.size(); i++) {
-                byte[] data = receiveBuffer.getFrame(i).getData();
-                
-                //debug
-//                System.out.println(i);
-//                String output = new String(data, "UTF-8");
-//                System.out.println(output);
+            FileOutputStream ops = new FileOutputStream(this.outputDir);
 
+            //Ecriture de tous les octets sans le dernier
+            for (int i = 0; i < this.receiveBuffer.size() - 1; i++) {
+                byte[] data = receiveBuffer.getFrame(i).getData();
                 ops.write(data, 0, data.length);
             }
-            ops.close();
+            byte[] data = receiveBuffer.getFrame(this.receiveBuffer.size() - 1).getData();
 
+            //Ecriture du dernier octet, avec nettoyage des bits de remplissage
+            int eof = Arrays.asList(ArrayUtils.toObject(data)).indexOf(new Byte("0"));
+            ops.write(data, 0, eof);
+            ops.close();
         } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
 
-    // Fonction qui envoie un ACK
-    //
-    // La caractéristique "maison" d'un ACK est présentement un '1' au premier bit
-    //   des données. Le numéro de trame du ACK est le numéro de la trame qu'on
-    //   acknowledge. 
-    //
-    // La fonction essai d'envoyer tant qu'elle n'a pas réussi à placer la trame
-    //   dans le buffer d'envoi.
+    /**
+     * Fonction qui envoie un ACK
+     *
+     * La caractéristique "maison" d'un ACK est présentement un '1' au premier
+     * bit des données. Le numéro de trame du ACK est le numéro de la trame
+     * qu'on acknowledge.
+     *
+     * La fonction essai d'envoyer tant qu'elle n'a pas réussi à placer la trame
+     * dans le buffer d'envoi
+     */
     private void sendAck(Frame frame) {
         byte[] data = new byte[1];
         data[0] = 1;
@@ -235,18 +251,20 @@ public class Station extends Thread {
         } while (!sent);
     }
 
-    // Fonction qui envoie un NACK
-    //
-    // La caractéristique "maison" d'un NACK est présentement un '0' au premier bit
-    //   des données. Le numéro de trame du NACK est le numéro de la trame qu'on
-    //   acknowledge. 
-    //
-    // La fonction essai d'envoyer tant qu'elle n'a pas réussi à placer la trame
-    //   dans le buffer d'envoi.
-    //
-    // TODO : Les codes correcteurs et détecteurs n'ayant pas été faits, cette fonction
-    //          n'a pas été testée. Il sera probablement plus logique de passer en 
-    //          paramètre le numéro de la trame non-reçue que la trame non-reçue...
+    /**
+     * Fonction qui envoie un NACK
+     *
+     * La caractéristique "maison" d'un NACK est présentement un '0' au premier
+     * bit des données. Le numéro de trame du NACK est le numéro de la trame
+     * qu'on acknowledge.
+     *
+     * La fonction essai d'envoyer tant qu'elle n'a pas réussi à placer la trame
+     * dans le buffer d'envoi.
+     *
+     * TODO : Les codes correcteurs et détecteurs n'ayant pas été faits, cette
+     * fonction n'a pas été testée. Il sera probablement plus logique de passer
+     * en paramètre le numéro de la trame non-reçue que la trame non-reçue...
+     */
     private void sendNack(Frame frame) {
         byte[] data = new byte[1];
         data[0] = 0;
@@ -257,12 +275,25 @@ public class Station extends Thread {
         } while (!sent);
     }
 
-    // Fonction appelée par l'utilisateur pour définir le path du fichier en output.
+    /**
+     * Fonction appelée par l'utilisateur pour définir le path du fichier en
+     * output.
+     */
     public void setOutputDir(String outputDir) {
         this.outputDir = outputDir;
     }
 
-    // Fonction permettant d'obtenir le numéro de la station.
+    /**
+     * Fonction appelée par l'utilisateur pour définir le path du fichier en
+     * output.
+     */
+    public void setTempo(int t) {
+        this.tempo = t;
+    }
+
+    /**
+     * Fonction permettant d'obtenir le numéro de la station.
+     */
     public int getStationNumber() {
         return stationNumber;
     }
