@@ -1,5 +1,7 @@
 package Protocole;
 
+import java.util.Arrays;
+
 /**
  * Objet permettant d'abstraire un tampon d'envoi et de réception.
  *
@@ -123,6 +125,16 @@ public class Buffer {
     //
     // TODO : Il faudrait une protection si la trame n'existe pas.
     public Frame getFrame(int i) {
+        //Debug
+//        System.err.println("i = "+i);
+//        if (i == 8) {
+//            int[] b = new int[this.buffer.length];
+//            for (int j = 0; j < this.buffer.length; j++) {
+//                b[j] = this.buffer[j].getFrameNumber();
+//            }
+//            System.err.println("i = " + i + ", array = " + Arrays.toString(b));
+//        }
+
         return buffer[i];
     }
 

@@ -9,63 +9,58 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /*
-    Objet permettant de représenter un support de transmission.
+ Objet permettant de représenter un support de transmission.
 
-    TODO : La création des erreurs et la latence, entre autre, ne sont pas encore faits.
+ TODO : La création des erreurs et la latence, entre autre, ne sont pas encore faits.
  */
-
-public class Support extends Thread{
+public class Support extends Thread {
     // Variables pour l'envoi de messages de la source à la destination
-    
+
     // Trame que la source veut envoyer.
     private Frame sendSource;
-    
+
     // Trame reçu par la destination.
     private Frame receivedAtDestination;
-    
+
     // Le support est prêt à envoyer une trame de la source (TRUE)
     // La trame est en attente d'être envoyé à la destination (FALSE)
-    private boolean readyToSendSource; 
-    
+    private boolean readyToSendSource;
+
     // Le support a envoyé une trame à la destination qui ne l'a pas encore traité (TRUE)
     // Il n'y a pas de trame en attente du côté de la destination (FALSE)
-    private boolean dataReceivedAtDest; 
-    
-    
+    private boolean dataReceivedAtDest;
+
     // Variables pour l'envoi du ACK/NAK
-    
     // Trame que la destination veut envoyer.
     private Frame sendDestination;
-    
+
     // Trame reçue par la source.
     private Frame receivedAtSource;
-    
+
     // Le support est prêt à envoyer une trame de la destination (TRUE)
     // La trame est en attente d'être envoyé à la source (FALSE)
     private boolean readyToSendDestination;
-    
+
     // Le support a envoyé une trame à la source qui ne l'a pas encore traité (TRUE)
     // Il n'y a pas de trame en attente du côté de la source (FALSE)
     private boolean dataReceivedAtSource;
-    
-    
+
     // Afin de se simplifier la vie, le support est unidirectionnel.
     private int sourceNumber = 0;
     private int destinationNumber = 0;
-    
-    
+
     // Type d'erreur
     private int typeError;
     final static private int NOERROR = 0;
     final static private int CORRUPTION = 1;
     final static private int LOSTFRAME = 2;
-    
+
     private int errorCounter;
     final static private int errorOccurence = 10;
-    
+
     // Constructeur
     // Par défaut, on décide qu'une station sera la source et l'autre la destination.
-    public Support(int sourceNumber, int destinationNumber, int error){
+    public Support(int sourceNumber, int destinationNumber, int error) {
         this.sourceNumber = sourceNumber;
         this.destinationNumber = destinationNumber;
         readyToSendSource = readyToSendDestination = true;
@@ -73,16 +68,16 @@ public class Support extends Thread{
         this.typeError = error;
         this.errorCounter = 0;
     }
-    
+
     // Fonction appelée par une station afin de savoir si elle peut envoyer
     //   une trame sur le support.
-    public synchronized boolean isReadyToSend(int stationNumber){
-        if(stationNumber == sourceNumber){
+    public synchronized boolean isReadyToSend(int stationNumber) {
+        if (stationNumber == sourceNumber) {
             return readyToSendSource;
-        } else if (stationNumber == destinationNumber){
+        } else if (stationNumber == destinationNumber) {
             return readyToSendDestination;
         }
-        return false; 
+        return false;
     }
 
     // Fonction appelée par une station afin de savoir si elle a reçu une trame.
@@ -101,11 +96,11 @@ public class Support extends Thread{
     //          même si le support est "occupé".
     public synchronized void sendFrame(Frame frame, int stationNumber) {
         if (stationNumber == sourceNumber) {
-           readyToSendSource = false;
-           sendSource = frame;
+            readyToSendSource = false;
+            sendSource = frame;
         } else if (stationNumber == destinationNumber) {
-           readyToSendDestination = false;
-           sendDestination = frame;
+            readyToSendDestination = false;
+            sendDestination = frame;
         }
     }
 
@@ -125,33 +120,33 @@ public class Support extends Thread{
     }
 
     // Fonction permettant de redéfinir la source. N'est plus vraiment nécessaire.
-    public void setSource(int sourceNumber){
+    public void setSource(int sourceNumber) {
         this.sourceNumber = sourceNumber;
     }
-    
+
     // Fonction permettant de redéfinir la destination. N'est plus vraiment nécessaire.
-    public void setDestination(int destinationNumber){
+    public void setDestination(int destinationNumber) {
         this.destinationNumber = destinationNumber;
     }
-    
+
     private Frame transfert(Frame frame) {
-        // Latence
+        // Latence (default = 100 ? instancier depuis param ?)
         try {
-            Support.sleep(100);
+            Support.sleep(10);
         } catch (InterruptedException ex) {
             Logger.getLogger(Support.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        if(typeError != NOERROR){
+        if (typeError != NOERROR) {
             errorCounter = (errorCounter + 1) % errorOccurence;
             //System.out.println(errorCounter);
         }
-        
+
         switch (typeError) {
             case NOERROR:
                 break;
             case CORRUPTION:
-                if (errorCounter == 0){
+                if (errorCounter == 0) {
                     System.out.println("Frame : " + frame.getFrameNumber() + "  Data :");
                     int frameNumber = frame.getFrameNumber();
                     int numberOfFrames = frame.getNumberOfFrames();
@@ -161,9 +156,11 @@ public class Support extends Thread{
                     byte[] rawData = frame.getData();
                     boolean[] data = new boolean[rawData.length * 8];
                     data = hamming.byteToBitArray(frame.getData());
-                    System.out.println(data[3]);
-                    data[3] = !data[3];
-                    System.out.println(data[3]);
+                    for (int k = 0; k < rawData.length * 8; k++) {
+                        if (Math.random() < 0.5) {
+                            data[k] = !data[k];
+                        }
+                    }
                     byte[] newData = hamming.bitToByteArray(data);
                     frame = new Frame(rawData.length, newData, true);
                     frame.setFrameNumber(frameNumber);
@@ -171,14 +168,14 @@ public class Support extends Thread{
                 }
                 break;
             case LOSTFRAME:
-                if (errorCounter == 0){
+                if (errorCounter == 0) {
 //                    System.out.println("Frame : " + frame.getFrameNumber() + "  Data :");
 //                    frame.readData();
                     frame = null;
                 }
                 break;
         }
-        
+
         return frame;
     }
 
@@ -190,12 +187,12 @@ public class Support extends Thread{
     //
     // TODO : Il manque la simulation de la latence et l'introduction d'erreur.
     @Override
-    public void run(){
-        while(true){
+    public void run() {
+        while (true) {
             // Ça ne fonctionne pas sans le sleep...
             //
             // TODO : Élucider le mystère du sleep. Sans lui, plus rien ne fonctionne.
-            
+
             // Vérifie si la source attend pour envoyer une trame et que la destination
             //   a traité sa dernière trame reçue.
 //            try {
@@ -203,7 +200,6 @@ public class Support extends Thread{
 //            } catch (InterruptedException ex) {
 //                Logger.getLogger(Support.class.getName()).log(Level.SEVERE, null, ex);
 //            }
-    
             Frame frameToSend;
             synchronized (System.out) {
                 if (!readyToSendSource && !dataReceivedAtDest && sendSource != null) {
@@ -222,7 +218,7 @@ public class Support extends Thread{
             }
 
             synchronized (System.out) {
-            // Vérifie si la destination attend pour envoyer une trame et que la source
+                // Vérifie si la destination attend pour envoyer une trame et que la source
                 //   a traité sa dernière trame reçue.
                 if (!readyToSendDestination && !dataReceivedAtSource && sendDestination != null) {
                     //synchronized (System.out) {

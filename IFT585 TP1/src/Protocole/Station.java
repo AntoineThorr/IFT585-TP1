@@ -5,6 +5,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.lang3.ArrayUtils;
@@ -34,6 +36,12 @@ public class Station extends Thread {
 
     // Numéro de la station permettant de s'identifier sur le support.
     private int stationNumber;
+
+    // Délai de temporisation (durée du timer du buffer)
+    private int tempo;
+
+    //Timers gérant l'expiration des frames envoyées (remplace le tick maison)
+    Timer[] sTimers;
 
     /**
      * Constructeur
@@ -125,16 +133,25 @@ public class Station extends Thread {
         supportTransmission.setSource(stationNumber);
         supportTransmission.setDestination(destination);
 
-        int i = 0;
         int numberOfFrames = frameFactory.getNumberOfFrames();
+        sTimers = new Timer[numberOfFrames];
 
         // Remplir le tampon d'envoi
         // Tant que toutes les trames n'ont pas toutes été envoyées, la fonction
         //   va vérifier si le tampon d'envoi est plein. Si ce n'est pas le cas,
         //   elle va y placer la prochaine trame.
+        int i = 0;
         while (i < numberOfFrames) {
             if (sendBuffer.isNotFull()) {
                 sendBuffer.addFrame(frameFactory.getFrame(i));
+//                sTimers[i] = new Timer();
+//                sTimers[i].schedule(new TimerTask() {
+//                    public void run() {
+//                        //TODO - Gérer l'expiration de la trame, ici ou dans station ?
+//                        System.err.println("TIMER ");
+//                    }
+//                }, tempo);
+//                System.err.println("i");
                 i++;
             }
         }
@@ -264,6 +281,14 @@ public class Station extends Thread {
      */
     public void setOutputDir(String outputDir) {
         this.outputDir = outputDir;
+    }
+
+    /**
+     * Fonction appelée par l'utilisateur pour définir le path du fichier en
+     * output.
+     */
+    public void setTempo(int t) {
+        this.tempo = t;
     }
 
     /**
