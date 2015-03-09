@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package Protocole;
 
 import java.io.File;
@@ -40,7 +35,9 @@ public class Station extends Thread {
     // Numéro de la station permettant de s'identifier sur le support.
     private int stationNumber;
 
-    // Constructeur
+    /**
+     * Constructeur
+     */
     public Station(Support supportTransmission, int bufferSize, int frameSize, int stationNumber) {
         this.supportTransmission = supportTransmission;
         sendBuffer = new Buffer(bufferSize);
@@ -198,22 +195,14 @@ public class Station extends Thread {
     private void writeFile() {
         try {
             FileOutputStream ops = new FileOutputStream(this.outputDir);
-            
+
             //Ecriture de tous les octets sans le dernier
             for (int i = 0; i < this.receiveBuffer.size() - 1; i++) {
                 byte[] data = receiveBuffer.getFrame(i).getData();
-
-                //debug
-//                System.out.println(i);
-//                String output = new String(data, "UTF-8");
-//                System.out.println(output);
                 ops.write(data, 0, data.length);
-//                String output = new String(data, "UTF-8");
-//                System.out.println(output);
-//                System.out.println(data);
             }
             byte[] data = receiveBuffer.getFrame(this.receiveBuffer.size() - 1).getData();
-            
+
             //Ecriture du dernier octet, avec nettoyage des bits de remplissage
             int eof = Arrays.asList(ArrayUtils.toObject(data)).indexOf(new Byte("0"));
             ops.write(data, 0, eof);
@@ -223,14 +212,16 @@ public class Station extends Thread {
         }
     }
 
-    // Fonction qui envoie un ACK
-    //
-    // La caractéristique "maison" d'un ACK est présentement un '1' au premier bit
-    //   des données. Le numéro de trame du ACK est le numéro de la trame qu'on
-    //   acknowledge. 
-    //
-    // La fonction essai d'envoyer tant qu'elle n'a pas réussi à placer la trame
-    //   dans le buffer d'envoi.
+    /**
+     * Fonction qui envoie un ACK
+     *
+     * La caractéristique "maison" d'un ACK est présentement un '1' au premier
+     * bit des données. Le numéro de trame du ACK est le numéro de la trame
+     * qu'on acknowledge.
+     *
+     * La fonction essai d'envoyer tant qu'elle n'a pas réussi à placer la trame
+     * dans le buffer d'envoi
+     */
     private void sendAck(Frame frame) {
         byte[] data = new byte[1];
         data[0] = 1;
@@ -243,18 +234,20 @@ public class Station extends Thread {
         } while (!sent);
     }
 
-    // Fonction qui envoie un NACK
-    //
-    // La caractéristique "maison" d'un NACK est présentement un '0' au premier bit
-    //   des données. Le numéro de trame du NACK est le numéro de la trame qu'on
-    //   acknowledge. 
-    //
-    // La fonction essai d'envoyer tant qu'elle n'a pas réussi à placer la trame
-    //   dans le buffer d'envoi.
-    //
-    // TODO : Les codes correcteurs et détecteurs n'ayant pas été faits, cette fonction
-    //          n'a pas été testée. Il sera probablement plus logique de passer en 
-    //          paramètre le numéro de la trame non-reçue que la trame non-reçue...
+    /**
+     * Fonction qui envoie un NACK
+     *
+     * La caractéristique "maison" d'un NACK est présentement un '0' au premier
+     * bit des données. Le numéro de trame du NACK est le numéro de la trame
+     * qu'on acknowledge.
+     *
+     * La fonction essai d'envoyer tant qu'elle n'a pas réussi à placer la trame
+     * dans le buffer d'envoi.
+     *
+     * TODO : Les codes correcteurs et détecteurs n'ayant pas été faits, cette
+     * fonction n'a pas été testée. Il sera probablement plus logique de passer
+     * en paramètre le numéro de la trame non-reçue que la trame non-reçue...
+     */
     private void sendNack(Frame frame) {
         byte[] data = new byte[1];
         data[0] = 0;
@@ -265,12 +258,17 @@ public class Station extends Thread {
         } while (!sent);
     }
 
-    // Fonction appelée par l'utilisateur pour définir le path du fichier en output.
+    /**
+     * Fonction appelée par l'utilisateur pour définir le path du fichier en
+     * output.
+     */
     public void setOutputDir(String outputDir) {
         this.outputDir = outputDir;
     }
 
-    // Fonction permettant d'obtenir le numéro de la station.
+    /**
+     * Fonction permettant d'obtenir le numéro de la station.
+     */
     public int getStationNumber() {
         return stationNumber;
     }
