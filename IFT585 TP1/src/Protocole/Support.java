@@ -60,6 +60,7 @@ public class Support extends Thread {
      *
      * @param sourceNumber      Numéro (ID) de la source
      * @param destinationNumber Numéro (ID) du récepteur
+     * @param delay
      * @param error             Numéro (ID) de l'erreur à générer
      */
     public Support(int sourceNumber, int destinationNumber, int delay, int error) {
@@ -160,7 +161,7 @@ public class Support extends Thread {
      *
      * TODO - Vérifier l'utilité, la supprimer si non nécessaire
      *
-     * @param sourceNumber Numéro (ID) de la station destination
+     * @param destinationNumber
      */
     public void setDestination(int destinationNumber) {
         this.destinationNumber = destinationNumber;

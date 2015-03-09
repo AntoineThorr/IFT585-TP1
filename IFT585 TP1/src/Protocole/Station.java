@@ -15,6 +15,12 @@ import org.apache.commons.lang3.ArrayUtils;
  Objet permettant de représenter une station d'émission et de réception de
  trames.
  */
+
+/**
+ *
+ * @author Antoine
+ */
+
 public class Station extends Thread {
 
     // Le support de transmission utilisé par la station.
@@ -139,7 +145,6 @@ public class Station extends Thread {
      *
      * @param file        Fichier à envoyer
      * @param destination Indicatif de la station de destination
-     * @throws IOException
      */
     public void sendFile(File file, int destination) {
         //Division le fichier à envoyer en sections de données
