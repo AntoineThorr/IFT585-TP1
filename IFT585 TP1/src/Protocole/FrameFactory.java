@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
-import static org.apache.commons.lang3.ArrayUtils.toPrimitive;
 
 /*
  Objet permettant de diviser un fichier en une série de trames.
@@ -108,9 +107,8 @@ public class FrameFactory {
         int start = this.frameCount * this.frameSize;
         int stop = (this.frameCount + 1) * this.frameSize;
         byte[] frameData = Arrays.copyOfRange(data, start, stop);
-
-        //TODO - ajouter code de Hamming
-        //Hamming.code(frameData);
+        
+//        Frame f = new Frame(this.frameSize, Hamming.code(frameData), true);
         Frame f = new Frame(this.frameSize, frameData, true);
         this.frameCount++;
         return f;

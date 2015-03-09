@@ -9,8 +9,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.lang3.ArrayUtils;
 
 /*
  Objet permettant de représenter une station d'émission et de réception de
@@ -88,7 +90,6 @@ public class Station extends Thread {
 
             // On vérifie si une trame a été reçu et que le buffer de réception n'est pas 
             // plein.
-            
             if (supportTransmission.asReceivedData(stationNumber) && receiveBuffer.isNotFull()) {
                 // On va chercher la trame reçue.
                 Frame frameReceived = supportTransmission.retrieveData(stationNumber);
@@ -196,20 +197,27 @@ public class Station extends Thread {
 //    }
     private void writeFile() {
         try {
-            FileOutputStream ops = new FileOutputStream(outputDir);
-            //this.receiveBuffer.getFrame(frameSize);
-            for (int i = 0; i < this.receiveBuffer.size(); i++) {
+            FileOutputStream ops = new FileOutputStream(this.outputDir);
+            
+            //Ecriture de tous les octets sans le dernier
+            for (int i = 0; i < this.receiveBuffer.size() - 1; i++) {
                 byte[] data = receiveBuffer.getFrame(i).getData();
-                
+
                 //debug
 //                System.out.println(i);
 //                String output = new String(data, "UTF-8");
 //                System.out.println(output);
-
                 ops.write(data, 0, data.length);
+//                String output = new String(data, "UTF-8");
+//                System.out.println(output);
+//                System.out.println(data);
             }
+            byte[] data = receiveBuffer.getFrame(this.receiveBuffer.size() - 1).getData();
+            
+            //Ecriture du dernier octet, avec nettoyage des bits de remplissage
+            int eof = Arrays.asList(ArrayUtils.toObject(data)).indexOf(new Byte("0"));
+            ops.write(data, 0, eof);
             ops.close();
-
         } catch (IOException ex) {
             ex.printStackTrace();
         }
